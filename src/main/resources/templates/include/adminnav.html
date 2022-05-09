@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="adminnav">
+
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" style="color:#ffffff"\>
+        <div class="sidebar-brand-icon rotate-n-15" >
+            <i class="fas fa-laugh-wink"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">ADMIN PAGE </div>
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider my-0">
+
+    <!-- Nav Item - Pages Collapse Menu -->
+    <script type="text/javascript" th:inline="javascript">
+
+        var productList = function () {
+            $('#productList').attr('method','post')
+                .attr('action', '/admin/productList')
+                .submit();
+        }
+    </script>
+    <li style="height: 56px" class="nav-item">
+        <form id="productList"><a herf="#" onclick="productList()" class="nav-link collapsed"  data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+<!--            <i class="fas fa-fw fa-cog"></i>-->
+            <img src="/static/img/new-product.png" style="width: 30px">
+            <span>상품관리</span>
+        </a>
+        </form>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Custom Components:</h6>
+                <a class="collapse-item" href="buttons.html">Buttons</a>
+                <a class="collapse-item" href="cards.html">Cards</a>
+            </div>
+        </div>
+    </li>
+
+    <!-- Nav Item - Utilities Collapse Menu -->
+    <script type="text/javascript" th:inline="javascript">
+
+        var orderList = function () {
+            $('#orderList').attr('method','post')
+                .attr('action', '/admin/orderList')
+                .submit();
+        }
+    </script>
+    <li class="nav-item" style="height: 56px">
+        <form id = "orderList">
+            <a class="nav-link collapsed" href="#" onclick="orderList();" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
+                <img src="/static/img/order.png" style="width: 30px">
+                <span>주문관리</span>
+            </a>
+        </form>
+
+        <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Custom Utilities:</h6>
+                <a class="collapse-item" href="utilities-color.html">Colors</a>
+                <a class="collapse-item" href="utilities-border.html">Borders</a>
+                <a class="collapse-item" href="utilities-animation.html">Animations</a>
+                <a class="collapse-item" href="utilities-other.html">Other</a>
+            </div>
+        </div>
+    </li>
+
+
+<!--     Nav Item - Pages Collapse Menu-->
+    <script type="text/javascript" th:inline="javascript">
+
+        var memberList = function () {
+            $('#memberList').attr('method','post')
+                .attr('action', '/admin/memberList')
+                .submit();
+        }
+    </script>
+    <li class="nav-item" style="height: 56px">
+        <form id = "memberList">
+            <a class="nav-link collapsed" herf="#" onclick="memberList();" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true" aria-controls="collapsePages">
+                <img src="/static/img/member.png" style="width: 30px">
+                <span>회원관리</span>            </a>
+        </form>
+
+        <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Login Screens:</h6>
+                <a class="collapse-item" href="login.html">Login</a>
+                <a class="collapse-item" href="register.html">Register</a>
+                <a class="collapse-item" href="forgot-password.html">Forgot Password</a>
+                <div class="collapse-divider"></div>
+                <h6 class="collapse-header">Other Pages:</h6>
+                <a class="collapse-item" href="404.html">404 Page</a>
+                <a class="collapse-item" href="blank.html">Blank Page</a>
+            </div>
+        </div>
+    </li>
+
+    <!-- Nav Item - Charts -->
+    <li class="nav-item">
+        <a class="nav-link" onclick="goqnasetting()">
+            <img src="/static/img/qna.png" style="width: 30px">
+            <span>게시판관리</span></a>
+    </li>
+    <script type="text/javascript" th:inline="javascript">
+
+        var goqnasetting = function() {
+            alert("현재 게시판을 사용 할수 없습니다.")
+        }
+        /**
+        var goqnasetting = function () {
+            $('#memberList').attr('method','get')
+                .attr('action', '/admin/qnaSetting')
+                .submit();
+        }
+**/
+    </script>
+
+
+    <!-- Divider -->
+    <hr class="sidebar-divider d-none d-md-block">
+
+
+</div>
+</body>
+</html>

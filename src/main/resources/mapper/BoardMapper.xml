@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+    <mapper namespace="com.momo.shop.mapper.BoardMapper">
+
+    <!-- Board insert -->
+    <insert id="insertBoard"
+            parameterType="com.momo.shop.model.BoardVO"
+            useGeneratedKeys="true"
+            keyProperty="qna_no">
+        <![CDATA[
+            INSERT INTO qna (
+                m_no,qna_originno, qna_title , qna_context, qna_passwd, qna_regdate,privateck
+            )
+            VALUES (
+                #{m_no},(SELECT IFNULL(max(qna_no)+1,1)FROM qna q),#{qna_title} ,#{qna_context}, password(#{qna_passwd}), now(), #{privateck}
+            )
+        ]]>
+    </insert>
+
+    <insert id="replyBoard"
+            parameterType="com.momo.shop.model.BoardVO"
+            useGeneratedKeys="true"
+            keyProperty="qna_no">
+        <![CDATA[
+            INSERT INTO qna (
+                m_no, qna_originno, qna_title, qna_context, qna_passwd, qna_regdate, qna_groupOrd,privateck
+            )
+            VALUES (
+                #{m_no},(select q.qna_originno FROM qna q where qna_no=#{qna_no}),concat(" └RE :", #{qna_title}), #{qna_context}, password(#{qna_passwd}), now(), #{qna_groupOrd}+1,#{privateck}
+            )
+        ]]>
+    </insert>
+
+    <update id="updateBoard" parameterType="com.momo.shop.model.BoardVO">
+        UPDATE qna
+        SET
+            qna_context = #{qna_context}
+        WHERE qna_no = #{qna_no}
+
+    </update>
+
+    <delete id="deleteBoard" parameterType="int">
+        DELETE FROM qna WHERE qna_no = #{qna_no}
+    </delete>
+
+    <select id="selectBoard" parameterType="Integer" resultType="com.momo.shop.model.BoardVO">
+        SELECT
+            q.qna_no, q.m_no, m.m_name, q.qna_context, q.qna_passwd, q.qna_regdate, q.qna_title, q.privateck
+        FROM qna q
+        inner join member m on q.m_no = m.m_no
+        WHERE q.qna_no = #{qna_no}
+    </select>
+
+    <select id="selectBoardList"
+            parameterType="com.momo.shop.model.BoardPaging"
+            resultType="com.momo.shop.model.BoardVO">
+        SELECT
+            q.qna_no, q.m_no, q.qna_title, q.qna_regdate,q.qna_originno, q.qna_groupOrd, q.privateck
+            , m.m_id, m.m_name
+        FROM qna q
+            inner join member m on q.m_no = m.m_no
+        WHERE 1=1
+        <if test="searchKeyword != null and searchKeyword != ''">
+            AND q.qna_context like concat('%', ${searchKeyword}, '%')
+        </if>
+        ORDER BY q.qna_originno DESC, q.qna_groupOrd ASC
+        LIMIT #{limitBegin}, #{articleCount}
+    </select>
+
+
+    <select id="selectBoardListCount"
+            parameterType="com.momo.shop.model.BoardPaging"
+            resultType="int">
+        select count(1) from qna
+        WHERE 1=1
+        <if test="searchKeyword != null and searchKeyword != ''">
+            AND q.qna_context like concat('%', ${searchKeyword}, '%')
+        </if>
+    </select>
+
+    <select id="passck" parameterType="com.momo.shop.model.BoardVO" resultType="int">
+        SELECT count(1) as cnt FROM qna
+        where qna_no = #{qna_no}
+        and qna_passwd = password(#{qna_passwd});
+    </select>
+
+
+    <select id="idchk" parameterType="com.momo.shop.model.BoardVO" resultType="int">
+        SELECT count(1) as cnt FROM member
+        where m_id = #{m_id};
+    </select>
+
+</mapper>
+

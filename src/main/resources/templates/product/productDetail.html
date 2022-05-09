@@ -1,0 +1,196 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head th:include="include/import::import">
+    <meta charset="UTF-8">
+</head>
+<body>
+<div th:include="include/nav::nav"></div>
+<div style="height: 80px"></div>
+<h1>제품 상세페이지</h1>
+<table>
+    <tr>
+        <td rowspan="5">
+            <div><img th:src="@{/uploads/thumbnail/}+${map.product.thumb_300 }" /></div>
+        </td>
+        <td>
+            <div><span>상품 브랜드 :</span> <span th:text="${map.product.p_brand}"></span></div>
+
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div><span>상품 이름 :</span> <span th:text="${map.product.p_name}"></span></div>
+
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div><span>상품 가격 :</span> <span th:text="${map.product.p_price}"></span>원</div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div class="row">
+                <div class="col col-10">
+                    <label class="select">
+                        <select class="select" name="option" id="po_id">
+                            <option class="option" th:each="option : ${map.option}" th:value="${option.po_id}" th:text="${option.po_value} + '  : + ' + ${option.po_price}
+                                    +'   재고량=   '+${option.po_stock}">
+                            </option>
+                        </select>
+                        <select class="form-control select-checkbox" id="cart_amount" multiple="multiple">
+                            <th:block th:each="option : ${map.option[0]}">
+                                <option th:each="i : ${#numbers.sequence(1,option.po_stock)}" th:value="${i}" th:text="${i}" th:selected="${i==1}"></option>
+                            </th:block>
+                        </select>
+                    </label>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <input type="button" id = "cart" value ="장바구니 담기" onclick = "goCart(this);" th:attr="data-p_id=${map.product.p_id}">
+            <input type="button" id = "buy" value = "바로구매" onclick = "buy(this);" th:attr="data-p_id=${map.product.p_id}">
+
+        </td>
+    </tr>
+</table>
+    <div style="size: 0.3px">
+        <img th:src = "@{/uploads/detailimg/}+${map.product.detailimg_name}"/>
+    </div>
+
+<script type="text/javascript" th:inline="javascript">
+
+    var cam = /*[[${session.member}]]*/;
+    console.log(cam);
+    var a = /*[[${map.product}]]*/;
+    console.log(a.p_id);
+
+    $(document).ready(function(){
+        $("#po_id").on("change", function(){
+            var po_id =$(this).val();
+            console.log($(this).val());
+            $.ajax({
+                type: 'get',
+                url: '/product/Detail/poamount/'+po_id,
+                data: 'json',
+                error: function (error) {
+                    console.error("Error!");
+                },
+                success: function (data) {
+                    console.log("success!");
+                    var po_stock = data.poamount[0].po_stock;
+                    console.log(po_stock);
+                    $("#cart_amount").empty();
+                    for(i=1; i<=po_stock; i++){
+                    $("#cart_amount").append("<option value="+i+">"+i+"</option>");}
+                },
+                complete: function () {
+                    console.log("complete!");
+                }
+            });
+        });
+    });
+
+    var buy = function(obj){
+        if(cam!=null) {
+            var p_id = $(obj).data("p_id");
+            var m_no = cam.m_no;
+            var po_id = parseInt($.trim(($("#po_id option:selected").val())));
+            var cart_amount = parseInt($.trim(($("#cart_amount option:selected").val())));
+            console.log(p_id, m_no, po_id, cart_amount);
+
+            location.href = "/payment/buy/"+p_id+'/'+m_no+'/'+po_id+'/'+cart_amount
+
+        }
+
+        //     $.ajax({
+        //         url : '/payment/buy/',
+        //         type : 'post',
+        //         data : ojb,
+        //         dataType : 'json',
+        //         success : function(data){
+        //             console.log(data);
+        //             var map = new Map(JSON.parse(data));
+        //             $.ajax({
+        //                 url : '/payment/buy/',
+        //                 type : 'get',
+        //                 data : map,
+        //                 dataType : 'Map',
+        //                 success : function(){
+        //                     console.log("결제페이지로 이동합니다.")
+        //                 },
+        //                 error : function(error){
+        //                     console.log("결제페이지로 이동 실패")
+        //                 }
+        //             })
+        //         },
+        //         error : function(error){
+        //             console.log(error);
+        //             alert("오류!");
+        //         }
+        //     })
+        //
+        //
+        //
+        // }
+        else{
+            alert("로그인 후 이용해주세요.");
+            location.href ="/member/login";
+        }
+    }
+
+
+    var goCart = function(obj){
+
+        if(cam!=null){
+
+            var po_id = parseInt($.trim(($("#po_id option:selected").val())));
+            var cart_amount = parseInt($.trim(($("#cart_amount option:selected").val())));
+            var p_id = $(obj).data("p_id");
+            var m_no = cam.m_no;
+            console.log(m_no);
+            console.log(po_id);
+            console.log(cart_amount);
+            console.log(p_id);
+            var list = [];
+            list.push(po_id);
+            list.push(cart_amount);
+            list.push(p_id);
+            list.push(m_no);
+            console.log(list);
+            var ojb = { "cart" : list};
+
+            $.ajax({
+                url : '/payment/goCart/',
+                type : 'post',
+                data : ojb,
+                dataType : 'json',
+                success : function(data){
+                    if(data==1){
+                        alert("회원님의 장바구니에 담겼습니다!");
+                    }
+                    else{
+                        alert("이미 담긴 제품입니다. 장바구니를 확인 해 주세요.")
+                    }
+                },
+                error : function(error){
+                    console.log(error);
+                    alert("장바구니담기 실패!");
+                }
+            })
+
+    }
+
+        else{
+            alert("로그인 후 이용해주세요!");
+            location.href = "/member/login";
+        }
+
+    };
+
+
+</script>
+</body>
+</html>
